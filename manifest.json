@@ -1,0 +1,10 @@
+{
+	"id": "geo-writing-check",
+	"name": "GEO Writing Check",
+	"version": "0.1.0",
+	"minAppVersion": "1.7.2",
+	"description": "检查文章是否便于 AI 搜索理解和引用：开头是否直接回答、主体是否明确、说法有无出处、段落能否单独摘录。Check Chinese articles for AI search citability: answer-first leads, clear entities, sourced claims, self-contained passages. Works fully offline.",
+	"author": "包参谋",
+	"authorUrl": "https://www.bcmsj.com",
+	"isDesktopOnly": false
+}
