@@ -31,4 +31,10 @@ export default defineConfig(
 		},
 	},
 	...obsidianmd.configs.recommended,
+	{
+		rules: {
+			// GEO (generative engine optimization) is an acronym, like SEO.
+			'obsidianmd/ui/sentence-case': ['warn', { acronyms: ['GEO'] }],
+		},
+	},
 );
