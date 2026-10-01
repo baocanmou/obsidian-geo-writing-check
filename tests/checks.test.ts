@@ -16,8 +16,8 @@ function status(text: string, id: string, overrides: Partial<GeoSettings> = {}) 
 test('parser: frontmatter, blocks, code and comments', () => {
 	const doc = parse('---\ntitle: 标题\n主关键词: [南昌VI设计, 备用]\ntags:\n  - a\n  - b\n---\n# 一级\n\n第一段\n接着写\n\n- 列表\n> 引用\n\n```\n代码\n```\n\n%%\n注释\n%%\n\n| a | b |\n');
 	assert.deepEqual(doc.frontmatter, { title: ['标题'], 主关键词: ['南昌VI设计', '备用'], tags: ['a', 'b'] });
-	assert.deepEqual(doc.blocks.map((b) => [b.type, b.line]), [['heading', 8], ['paragraph', 10], ['list', 13], ['quote', 14], ['table', 24]]);
-	assert.equal(doc.blocks[1]!.text, '第一段\n接着写');
+	assert.deepEqual(doc.blocks.map((b) => [b.type, b.line]), [['heading', 8], ['paragraph', 10], ['paragraph', 11], ['list', 13], ['quote', 14], ['table', 24]]);
+	assert.equal(doc.blocks[1]!.text, '第一段');
 });
 
 test('short notes are skipped, long enough notes are scored', () => {
@@ -127,4 +127,70 @@ test('long input stays fast', () => {
 	const start = Date.now();
 	run(`开头直接回答。\n\n${FILL.repeat(200)}`);
 	assert.ok(Date.now() - start < 1500);
+});
+
+test('review: relative-time words inside ordinary phrases are not flagged', () => {
+	const safe = '如今年轻人更看重体验，节日前后客流最高，离门店最近的地铁站步行可达，附近日料店也多，说明年限要写清，十年前年轻人不这样，贴近日常，过去年份的数据，投标截止日前提交。';
+	const a = run(`开头直接回答。\n\n${safe}\n\n${FILL}`);
+	assert.deepEqual(a.findings.find((f) => f.id === 'relative-time')!.status, 'pass');
+	const b = run(`开头直接回答。\n\n最近我们改了方案，去年开始做，今年会扩店。\n\n${FILL}`);
+	assert.deepEqual(b.findings.find((f) => f.id === 'relative-time')!.marks.map((m) => m.text), ['最近', '去年', '今年']);
+});
+
+test('review: self-reference and sources', () => {
+	const a = run(`开头直接回答。\n\n做一本公司相册，一本品牌手册，日本公司的做法。请咨询有关部门。乘联会的数据显示销量上涨。\n\n${FILL}`);
+	assert.equal(a.findings.find((f) => f.id === 'self-reference')!.status, 'pass');
+	assert.equal(a.findings.find((f) => f.id === 'source')!.status, 'pass');
+});
+
+test('review: units and currency count as facts', () => {
+	for (const t of ['周期通常是 4 到 8 周。', '尺寸 200mm，容量 500ml，重 2kg。', '设计费 ¥3000 起。']) {
+		assert.notEqual(status(`${t}\n\n${FILL}`, 'facts'), 'fail', t);
+	}
+});
+
+test('review: a passing check never underlines, one long sentence is a warning', () => {
+	const a = run(`我们有专业团队。\n\n${FILL}\n\n${FILL}\n\n${FILL}`);
+	const vague = a.findings.find((f) => f.id === 'vague')!;
+	assert.equal(vague.status, 'pass');
+	assert.equal(vague.marks.length, 0);
+	assert.ok(a.findings.filter((f) => f.status === 'pass').every((f) => !f.marks.length && !f.advice));
+	const long = `${'这一句没有标点一直写下去'.repeat(10)}。`;
+	assert.equal(status(`开头直接回答。\n\n${long}\n\n${FILL}`, 'sentence'), 'warn');
+});
+
+test('review: %% inside code does not hide the prose after it', () => {
+	const text = `开头直接回答。\n\n\`\`\`sql\nWHERE a LIKE '%%'\n\`\`\`\n\n本公司最近的数据显示增长。\n\n%% 注释 %%\n\n${FILL}`;
+	const a = run(text);
+	assert.ok(a.findings.find((f) => f.id === 'self-reference')!.marks.length === 1);
+	assert.ok(a.findings.find((f) => f.id === 'relative-time')!.marks.length === 1);
+});
+
+test('review: each line is a paragraph; list continuation and indented fences', () => {
+	const lines = `第一行直接回答，品牌设计要 4 到 8 周。\n${FILL}\n${FILL}`;
+	const a = run(lines);
+	assert.equal(a.findings.find((f) => f.id === 'lead')!.status, 'pass');
+	const doc = parse('- 列表项\n  接着写\n    \`\`\`\n    本公司\n    \`\`\`\n');
+	assert.deepEqual(doc.blocks.map((b) => [b.type, b.text]), [['list', '- 列表项\n  接着写']]);
+});
+
+test('review: frontmatter and lead edge cases', () => {
+	assert.equal(status(`---\n品牌: 包参谋, 南昌\n---\n包参谋在南昌做品牌设计。\n\n${FILL}`, 'entity'), 'pass');
+	const folded = run(`---\ntitle: >\n  南昌品牌设计公司怎么选\n---\n直接回答。\n\n${FILL}`);
+	assert.equal(folded.findings.find((f) => f.id === 'title')!.status, 'pass');
+	assert.equal(status(`#品牌 #设计\n随着市场变化，品牌越来越重要。\n\n${FILL}`, 'lead'), 'fail');
+	assert.equal(status(`> [!tip] 摘要\n> 随着市场变化，品牌越来越重要。\n\n${FILL}`, 'lead'), 'fail');
+	assert.equal(status(`开头直接回答。\n\n其一，先定位。其二，再设计。\n\n${FILL}`, 'pronoun'), 'pass');
+});
+
+test('review: pathological input stays fast', () => {
+	for (const text of [
+		`# a${' '.repeat(60000)}b\n\n${FILL}`,
+		`开头。\n\n${'](x'.repeat(20000)}\n\n${FILL}`,
+		`开头。\n\n${'最近'.repeat(35000)}\n\n${FILL}`,
+	]) {
+		const start = Date.now();
+		run(text);
+		assert.ok(Date.now() - start < 1500, `${Date.now() - start}ms`);
+	}
 });

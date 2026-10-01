@@ -6,7 +6,7 @@ export const DISCLAIMER = '分数只反映文章的结构和写法是否便于 A
 export const SKIPPED = {
 	scope: '这篇笔记不在检查范围内。',
 	switch: '这篇笔记已在属性中关闭检查。',
-	length: '这篇笔记超过 30 万字，未做检查。',
+	length: '这篇笔记超过 30 万字符，未做检查。',
 	short: '正文太短，未做检查。',
 };
 

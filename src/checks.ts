@@ -1,4 +1,4 @@
-import { length, overlaps, sentences, visible, type Block, type Doc } from './markdown';
+import { length, lineOf, overlaps, sentences, visible, type Block, type Doc } from './markdown';
 
 export type Status = 'pass' | 'warn' | 'fail' | 'tip';
 
@@ -75,18 +75,24 @@ const INFO = new Map(CHECKS.map((c) => [c.id, c]));
 const FILLER =
 	/^(?:随着|在当今|在如今|当今|如今|近年来|近些年|众所周知|大家都知道|相信很多|相信大家|你是否|你是不是|你有没有|有没有想过|说到|提到|提起|说起|在这个[^，。]{0,12}时代|在[^，。]{0,10}的今天|俗话说|古人云|不知道大家)/;
 const PRONOUN =
-	/^(?:它们?|他们|她们|这个|这种|这些|这类|这样的|上述|前者|后者|其(?![实他它中次余间])|该(?:品牌|公司|产品|项目|方案|方法|模型|门?店|企业|机构|平台|服务|系统|工具|功能|技术|标准|规定|行业|市场|地区|城市)|此(?:举|事|法|类|种|款|项|处)|以上(?:这|几|两|三|四|五|内容|方法|做法))/;
+	/^(?:它们?|他们|她们|这个|这种|这些|这类|这样的|上述|前者|后者|其(?![实他它中次余间一二三四五六七八九十])|该(?:品牌|公司|产品|项目|方案|方法|模型|门?店|企业|机构|平台|服务|系统|工具|功能|技术|标准|规定|行业|市场|地区|城市)|此(?:举|事|法|类|种|款|项|处)|以上(?:这|几|两|三|四|五|内容|方法|做法))/;
 const SELF = /本公司|我司|我公司|本店|本品牌|本机构|本平台|小编/g;
+/** “一本公司相册”“日本公司” are not self-reference. */
+const SELF_SKIP = /[一日基成资根版剧样书课范文脚账]本(?:公司|店|品牌|机构|平台)/g;
 const CLAIM =
-	/数据显示|数据表明|研究表明|研究发现|研究显示|调查显示|调研显示|据统计|据了解|据悉|报告指出|报告显示|专家表示|专家认为|专家指出|业内人士|有关部门|权威机构|有数据表明|科学证明/g;
-const SOURCED = /《[^》]+》|https?:\/\/|\]\(|\[\[|来源|出自|引自|发布的|公布的/;
+	/数据显示|数据表明|研究表明|研究发现|研究显示|调查显示|调研显示|据统计|据了解|据悉|报告指出|报告显示|专家表示|专家认为|专家指出|业内人士|有数据表明|科学证明/g;
+const SOURCED =
+	/《[^》]+》|https?:\/\/|\]\(|\[\[|来源|出自|引自|发布的|公布的|(?:会|局|部|委|署|院|所|中心|协会|学会|大学|研究院|集团|银行|机构|平台)(?:的|最新的)?(?:数据|研究|调查|调研|报告|统计)/;
 const VAGUE =
 	/领先的|优质的|一站式|全方位|高品质|高端大气|匠心|赋能|深耕|助力|引领|卓越|行业标杆|口碑良好|广受好评|深受喜爱|实力雄厚|经验丰富|值得信赖|专业团队|用心服务|品质保证|性价比高|备受青睐|不二之选/g;
 const RELATIVE =
 	/最近|近期|近日|日前|前不久|不久前|前段时间|今年|去年|明年|前年|上个月|本月|下个月|上周|本周|下周|上半年|下半年/g;
+/** Ordinary words that contain a relative-time word: 如今年轻、说明年限、贴近日常、节日前后、离门店最近的. */
+const RELATIVE_SKIP =
+	/如今年|今年轻|年前年|过去年|[说表证声标注写查阐发聪光文鲜清透分]明年|[贴接靠邻临将附]近日|近日[常用料]|[节生假工作念止]日前|日前[后夕]|离[^，。；\n]{0,10}最近|最近的(?:地铁|门店|距离|站|路|地方|位置|城市|店|医院|学校)|[上下本]周[期边年]|本月[刊报]/g;
 const FACT =
-	/\d+(?:\.\d+)?\s*(?:%|％|个|家|年|月|日|天|小时|分钟|元|万|亿|千|倍|次|人|名|款|种|项|条|平方|米|公里|斤|克|吨|岁|店|城|页|字|秒|件|套|类|步|成|折|期|届|号)|(?:19|20)\d{2}/;
-const FACT_ALL = new RegExp(FACT.source, 'g');
+	/\d+(?:\.\d+)?\s*(?:%|％|个|家|年|月|日|天|周|小时|分钟|元|块|万|亿|千|百|倍|次|轮|版|人|位|名|款|种|项|条|张|份|台|瓶|盒|箱|平方|㎡|米|公里|毫米|厘米|毫升|升|公斤|斤|克|吨|度|岁|店|城|页|字|秒|件|套|类|步|成|折|期|届|号|mm|cm|km|ml|kg|g|m)|[¥￥$]\s*\d|(?:19|20)\d{2}/i;
+const FACT_ALL = new RegExp(FACT.source, 'gi');
 const ROUGH = /[一二三四五六七八九十百千两半几]+(?:成|倍|年|个月|周|天|家|万|亿|千|百)/g;
 const QUESTION = /[？?]\s*$|吗|如何|怎么|怎样|为什么|为何|多少|哪些|哪个|哪里|是什么|有什么|能不能|要不要|该不该|值不值/;
 
@@ -95,7 +101,17 @@ const BLOCK_MARK = 12;
 
 function finding(id: string, status: Status, weight: number, summary: string, advice: string, marks: Mark[] = []): Finding {
 	const info = INFO.get(id) as CheckInfo;
-	return { id, group: info.group, name: info.name, status, weight: status === 'tip' ? 0 : weight, summary, advice, marks };
+	// A passing check underlines nothing, so the editor never contradicts the panel.
+	return {
+		id,
+		group: info.group,
+		name: info.name,
+		status,
+		weight: status === 'tip' ? 0 : weight,
+		summary,
+		advice: status === 'pass' ? '' : advice,
+		marks: status === 'pass' ? [] : marks,
+	};
 }
 
 function blockMark(block: Block, id: string, advice: string): Mark {
@@ -105,18 +121,32 @@ function blockMark(block: Block, id: string, advice: string): Mark {
 	return { from, to, line: block.line, text: visible(block.text).trim().slice(0, 24), check: id, name: (INFO.get(id) as CheckInfo).name, advice };
 }
 
-function lineAt(doc: Doc, block: Block, offset: number): number {
-	let line = block.line;
-	for (let i = block.from; i < offset; i++) if (doc.text.charCodeAt(i) === 10) line++;
-	return line;
-}
-
 /** Finds a pattern in prose blocks, skipping code, link targets and ignored words. */
-function findMarks(doc: Doc, re: RegExp, id: string, advice: string, ignore: string[], types = ['paragraph', 'list', 'quote']): Mark[] {
+function findMarks(
+	doc: Doc,
+	re: RegExp,
+	id: string,
+	advice: string,
+	ignore: string[],
+	skip?: RegExp,
+	types = ['paragraph', 'list', 'quote'],
+): Mark[] {
 	const marks: Mark[] = [];
 	const name = (INFO.get(id) as CheckInfo).name;
 	for (const block of doc.blocks) {
 		if (!types.includes(block.type)) continue;
+		const skipped: Array<[number, number]> = [];
+		if (skip) {
+			skip.lastIndex = 0;
+			let s: RegExpExecArray | null;
+			while ((s = skip.exec(block.text))) {
+				if (!s[0]) {
+					skip.lastIndex++;
+					continue;
+				}
+				skipped.push([block.from + s.index, block.from + s.index + s[0].length]);
+			}
+		}
 		re.lastIndex = 0;
 		let m: RegExpExecArray | null;
 		while ((m = re.exec(block.text))) {
@@ -127,7 +157,8 @@ function findMarks(doc: Doc, re: RegExp, id: string, advice: string, ignore: str
 			const from = block.from + m.index;
 			const to = from + m[0].length;
 			if (overlaps(doc.masks, from, to) || ignore.includes(m[0])) continue;
-			marks.push({ from, to, line: lineAt(doc, block, from), text: m[0], check: id, name, advice });
+			if (skipped.some(([a, b]) => a < to && b > from)) continue;
+			marks.push({ from, to, line: lineOf(doc, from), text: m[0], check: id, name, advice });
 		}
 	}
 	return marks;
@@ -147,7 +178,8 @@ export function runChecks(doc: Doc, cfg: CheckConfig, disabled: string[]): Findi
 	const on = (id: string) => !disabled.includes(id);
 
 	// ---- 直接回答
-	const lead = doc.blocks.find((b) => b.type === 'paragraph' || b.type === 'quote');
+	// The first prose a reader meets; a callout's title line is a label, not the lead.
+	const lead = doc.blocks.find((b) => b.type === 'paragraph' || (b.type === 'quote' && !/^\s*>+\s*\[!/.test(b.text)));
 	if (on('lead') && lead) {
 		const text = visible(lead.text).trim();
 		const size = length(lead.text);
@@ -233,7 +265,7 @@ export function runChecks(doc: Doc, cfg: CheckConfig, disabled: string[]): Findi
 
 	if (on('self-reference')) {
 		const advice = '换成品牌或机构的名称。';
-		const marks = findMarks(doc, SELF, 'self-reference', advice, cfg.ignore);
+		const marks = findMarks(doc, SELF, 'self-reference', advice, cfg.ignore, SELF_SKIP);
 		out.push(finding('self-reference', byCount(marks.length, 1, 4), 1, marks.length ? `${marks.length} 处使用“本公司”“小编”等自称。` : '没有无法归属的自称。', marks.length ? advice : '', marks));
 	}
 
@@ -265,7 +297,7 @@ export function runChecks(doc: Doc, cfg: CheckConfig, disabled: string[]): Findi
 				while ((m = CLAIM.exec(s.text))) {
 					const from = s.from + m.index;
 					if (overlaps(doc.masks, from, from + m[0].length) || cfg.ignore.includes(m[0])) continue;
-					marks.push({ from, to: from + m[0].length, line: lineAt(doc, block, from), text: m[0], check: 'source', name: '说法有出处', advice });
+					marks.push({ from, to: from + m[0].length, line: lineOf(doc, from), text: m[0], check: 'source', name: '说法有出处', advice });
 				}
 			}
 		}
@@ -303,10 +335,10 @@ export function runChecks(doc: Doc, cfg: CheckConfig, disabled: string[]): Findi
 				if (length(s.text) <= cfg.sentenceMax) continue;
 				const pad = s.text.length - s.text.trimStart().length;
 				const from = s.from + pad;
-				marks.push({ from, to: Math.min(s.to, from + BLOCK_MARK), line: lineAt(doc, block, from), text: visible(s.text).trim().slice(0, 24), check: 'sentence', name: '句子长度', advice });
+				marks.push({ from, to: Math.min(s.to, from + BLOCK_MARK), line: lineOf(doc, from), text: visible(s.text).trim().slice(0, 24), check: 'sentence', name: '句子长度', advice });
 			}
 		}
-		out.push(finding('sentence', byCount(marks.length, 2, 5), 1, marks.length ? `${marks.length} 个句子超过 ${cfg.sentenceMax} 字。` : `没有超过 ${cfg.sentenceMax} 字的句子。`, marks.length ? advice : '', marks));
+		out.push(finding('sentence', byCount(marks.length, 1, 5), 1, marks.length ? `${marks.length} 个句子超过 ${cfg.sentenceMax} 字。` : `没有超过 ${cfg.sentenceMax} 字的句子。`, marks.length ? advice : '', marks));
 	}
 
 	if (on('heading')) {
@@ -347,7 +379,7 @@ export function runChecks(doc: Doc, cfg: CheckConfig, disabled: string[]): Findi
 
 	if (on('relative-time')) {
 		const advice = '换成具体的年月，例如“2026 年 9 月”。';
-		const marks = findMarks(doc, RELATIVE, 'relative-time', advice, cfg.ignore);
+		const marks = findMarks(doc, RELATIVE, 'relative-time', advice, cfg.ignore, RELATIVE_SKIP);
 		out.push(finding('relative-time', byCount(marks.length, 1, 3), 2, marks.length ? `${marks.length} 处相对时间。` : '没有相对时间表述。', marks.length ? advice : '', marks));
 	}
 

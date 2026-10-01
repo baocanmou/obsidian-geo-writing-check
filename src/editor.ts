@@ -1,4 +1,4 @@
-import { RangeSetBuilder, type Extension } from '@codemirror/state';
+import { RangeSetBuilder, StateEffect, type Extension } from '@codemirror/state';
 import { Decoration, EditorView, ViewPlugin, hoverTooltip, type DecorationSet, type ViewUpdate } from '@codemirror/view';
 import { editorInfoField } from 'obsidian';
 import type { Analysis } from './analysis';
@@ -9,6 +9,9 @@ export interface EditorHost {
 }
 
 const MARK = Decoration.mark({ class: 'geo-mark' });
+const REFRESH = StateEffect.define<null>();
+/** Re-analyze this long after the last keystroke, not on every keystroke. */
+const DELAY = 400;
 
 /** Underlines the places a check points at and explains them on hover. */
 export function geoExtension(host: EditorHost): Extension {
@@ -16,13 +19,33 @@ export function geoExtension(host: EditorHost): Extension {
 		class {
 			marks: Mark[] = [];
 			decorations: DecorationSet = Decoration.none;
+			private timer: number | null = null;
 
 			constructor(view: EditorView) {
 				this.compute(view);
 			}
 
 			update(update: ViewUpdate) {
-				if (update.docChanged) this.compute(update.view);
+				if (update.transactions.some((tr) => tr.effects.some((e) => e.is(REFRESH)))) {
+					this.compute(update.view);
+					return;
+				}
+				if (!update.docChanged) return;
+				// Until the next analysis, keep the existing marks attached to the text they were on.
+				this.decorations = this.decorations.map(update.changes);
+				this.marks = this.marks
+					.map((m) => ({ ...m, from: update.changes.mapPos(m.from, 1), to: update.changes.mapPos(m.to, -1) }))
+					.filter((m) => m.from < m.to);
+				if (this.timer !== null) window.clearTimeout(this.timer);
+				const view = update.view;
+				this.timer = window.setTimeout(() => {
+					this.timer = null;
+					view.dispatch({ effects: REFRESH.of(null) });
+				}, DELAY);
+			}
+
+			destroy() {
+				if (this.timer !== null) window.clearTimeout(this.timer);
 			}
 
 			compute(view: EditorView) {

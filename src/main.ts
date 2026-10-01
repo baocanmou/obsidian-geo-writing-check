@@ -14,6 +14,8 @@ export default class GeoPlugin extends Plugin {
 	private statusBar: HTMLElement | null = null;
 	/** Path of the note last edited, so the side panel keeps working while it has focus. */
 	private targetPath: string | null = null;
+	/** The editor, side panel and status bar ask about the same text; analyze it once. */
+	private cache: { path: string | null; text: string; result: Analysis } | null = null;
 
 	async onload() {
 		await this.loadSettings();
@@ -75,6 +77,7 @@ export default class GeoPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		this.cache = null;
 		this.applyEditorExtension();
 		this.app.workspace.updateOptions();
 		this.refreshPanels();
@@ -86,7 +89,11 @@ export default class GeoPlugin extends Plugin {
 	}
 
 	analyze(path: string | null, basename: string, text: string): Analysis {
-		return analyze(this.settings, path, basename, text);
+		const c = this.cache;
+		if (c && c.path === path && c.text === text) return c.result;
+		const result = analyze(this.settings, path, basename, text);
+		this.cache = { path, text, result };
+		return result;
 	}
 
 	/** The Markdown view the side panel and status bar describe. */
@@ -123,7 +130,9 @@ export default class GeoPlugin extends Plugin {
 	jumpTo(mark: Mark) {
 		const view = this.targetView();
 		if (!view) return;
-		if (mark.to > view.editor.getValue().length) {
+		// The panel can lag behind typing; only jump to a place the current text still has.
+		const current = this.analyze(view.file?.path ?? null, view.file?.basename ?? '', view.editor.getValue());
+		if (!current.marks.some((m) => m.from === mark.from && m.to === mark.to && m.check === mark.check)) {
 			this.refreshPanels();
 			return;
 		}
@@ -144,8 +153,11 @@ export default class GeoPlugin extends Plugin {
 			new Notice('没有待修改的位置');
 			return;
 		}
-		const offset = editor.posToOffset(editor.getCursor('to'));
-		this.select(editor, marks.find((m) => m.from >= offset) ?? (marks[0] as Mark));
+		// Marks are sorted by start, then end; take the first one after the current selection.
+		const start = editor.posToOffset(editor.getCursor('from'));
+		const end = editor.posToOffset(editor.getCursor('to'));
+		const next = marks.find((m) => m.from > start || (m.from === start && m.to > end));
+		this.select(editor, next ?? (marks[0] as Mark));
 	}
 
 	async copyReport() {

@@ -98,7 +98,7 @@ export function analyze(settings: GeoSettings, path: string | null, basename: st
 	const bodyLength = doc.blocks.filter((b) => b.type !== 'heading').reduce((n, b) => n + length(b.text), 0);
 	if (bodyLength < settings.minLength) return { ...skip('short'), bodyLength };
 
-	const noteEntities = keys(settings.entityKeys).flatMap((k) => fm[k] ?? []);
+	const noteEntities = keys(settings.entityKeys).flatMap((k) => (fm[k] ?? []).flatMap(keys));
 	const config: CheckConfig = {
 		title: first(settings.titleKeys) || doc.blocks.find((b) => b.type === 'heading' && b.level === 1)?.text || basename,
 		keyword: first(settings.keywordKeys),
