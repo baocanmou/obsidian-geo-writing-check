@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="330" viewBox="0 0 1200 330" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans CJK SC, sans-serif">
+<rect x="1" y="1" width="1198" height="328" rx="20" fill="#faf8f3" stroke="#e4e0d5" stroke-width="2"/>
+<text x="40" y="62" font-size="26" font-weight="700" fill="#111111">How GEO Writing Check works</text>
+<rect x="40.0" y="104" width="168.3" height="150" rx="14" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="56.0" y="138" font-size="15" font-weight="700" fill="#686860">01</text>
+<text x="56.0" y="170" font-size="17" font-weight="700" fill="#111111">Open an article</text>
+<text x="56.0" y="198" font-size="14" font-weight="400" fill="#33332e">body of 300+</text>
+<text x="56.0" y="220" font-size="14" font-weight="400" fill="#33332e">characters</text>
+<path d="M211.3 179.0 L225.3 179.0" stroke="#111111" stroke-width="2.5"/>
+<path d="M219.3 173.0 L227.3 179.0 L219.3 185.0" fill="none" stroke="#111111" stroke-width="2.5"/>
+<rect x="230.3" y="104" width="168.3" height="150" rx="14" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="246.3" y="138" font-size="15" font-weight="700" fill="#686860">02</text>
+<text x="246.3" y="170" font-size="17" font-weight="700" fill="#111111">Read properties</text>
+<text x="246.3" y="198" font-size="14" font-weight="400" fill="#33332e">title, keyword,</text>
+<text x="246.3" y="220" font-size="14" font-weight="400" fill="#33332e">entity, date</text>
+<path d="M401.7 179.0 L415.7 179.0" stroke="#111111" stroke-width="2.5"/>
+<path d="M409.7 173.0 L417.7 179.0 L409.7 185.0" fill="none" stroke="#111111" stroke-width="2.5"/>
+<rect x="420.7" y="104" width="168.3" height="150" rx="14" fill="#ffd900" stroke="#111111" stroke-width="2"/>
+<text x="436.7" y="138" font-size="15" font-weight="700" fill="#686860">03</text>
+<text x="436.7" y="170" font-size="17" font-weight="700" fill="#111111">Run 17 checks</text>
+<text x="436.7" y="198" font-size="14" font-weight="400" fill="#33332e">answer, entity,</text>
+<text x="436.7" y="220" font-size="14" font-weight="400" fill="#33332e">evidence, passages</text>
+<path d="M592.0 179.0 L606.0 179.0" stroke="#111111" stroke-width="2.5"/>
+<path d="M600.0 173.0 L608.0 179.0 L600.0 185.0" fill="none" stroke="#111111" stroke-width="2.5"/>
+<rect x="611.0" y="104" width="168.3" height="150" rx="14" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="627.0" y="138" font-size="15" font-weight="700" fill="#686860">04</text>
+<text x="627.0" y="170" font-size="17" font-weight="700" fill="#111111">Score 0–100</text>
+<text x="627.0" y="198" font-size="14" font-weight="400" fill="#33332e">tips carry</text>
+<text x="627.0" y="220" font-size="14" font-weight="400" fill="#33332e">no weight</text>
+<path d="M782.3 179.0 L796.3 179.0" stroke="#111111" stroke-width="2.5"/>
+<path d="M790.3 173.0 L798.3 179.0 L790.3 185.0" fill="none" stroke="#111111" stroke-width="2.5"/>
+<rect x="801.3" y="104" width="168.3" height="150" rx="14" fill="#ffd900" stroke="#111111" stroke-width="2"/>
+<text x="817.3" y="138" font-size="15" font-weight="700" fill="#686860">05</text>
+<text x="817.3" y="170" font-size="17" font-weight="700" fill="#111111">Point to places</text>
+<text x="817.3" y="198" font-size="14" font-weight="400" fill="#33332e">dashed underline,</text>
+<text x="817.3" y="220" font-size="14" font-weight="400" fill="#33332e">hover for the fix</text>
+<path d="M972.7 179.0 L986.7 179.0" stroke="#111111" stroke-width="2.5"/>
+<path d="M980.7 173.0 L988.7 179.0 L980.7 185.0" fill="none" stroke="#111111" stroke-width="2.5"/>
+<rect x="991.7" y="104" width="168.3" height="150" rx="14" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="1007.7" y="138" font-size="15" font-weight="700" fill="#686860">06</text>
+<text x="1007.7" y="170" font-size="17" font-weight="700" fill="#111111">Revise, recheck</text>
+<text x="1007.7" y="198" font-size="14" font-weight="400" fill="#33332e">or copy the</text>
+<text x="1007.7" y="220" font-size="14" font-weight="400" fill="#33332e">report</text>
+<text x="40" y="294" font-size="16" fill="#686860">The score reflects how easy the writing is to understand and cite. It does not predict indexing, citations or recommendations.</text>
+</svg>

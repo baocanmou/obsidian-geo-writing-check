@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="330" viewBox="0 0 1200 330" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans CJK SC, sans-serif">
+<rect x="1" y="1" width="1198" height="328" rx="20" fill="#faf8f3" stroke="#e4e0d5" stroke-width="2"/>
+<text x="40" y="62" font-size="26" font-weight="700" fill="#111111">GEO 写作检查的工作流程</text>
+<rect x="40.0" y="104" width="168.3" height="150" rx="14" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="56.0" y="138" font-size="15" font-weight="700" fill="#686860">01</text>
+<text x="56.0" y="170" font-size="19" font-weight="700" fill="#111111">打开一篇文章</text>
+<text x="56.0" y="198" font-size="15" font-weight="400" fill="#33332e">正文 300 字以上</text>
+<text x="56.0" y="220" font-size="15" font-weight="400" fill="#33332e">才检查</text>
+<path d="M211.3 179.0 L225.3 179.0" stroke="#111111" stroke-width="2.5"/>
+<path d="M219.3 173.0 L227.3 179.0 L219.3 185.0" fill="none" stroke="#111111" stroke-width="2.5"/>
+<rect x="230.3" y="104" width="168.3" height="150" rx="14" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="246.3" y="138" font-size="15" font-weight="700" fill="#686860">02</text>
+<text x="246.3" y="170" font-size="19" font-weight="700" fill="#111111">读取笔记属性</text>
+<text x="246.3" y="198" font-size="15" font-weight="400" fill="#33332e">标题、关键词、</text>
+<text x="246.3" y="220" font-size="15" font-weight="400" fill="#33332e">主体名称、日期</text>
+<path d="M401.7 179.0 L415.7 179.0" stroke="#111111" stroke-width="2.5"/>
+<path d="M409.7 173.0 L417.7 179.0 L409.7 185.0" fill="none" stroke="#111111" stroke-width="2.5"/>
+<rect x="420.7" y="104" width="168.3" height="150" rx="14" fill="#ffd900" stroke="#111111" stroke-width="2"/>
+<text x="436.7" y="138" font-size="15" font-weight="700" fill="#686860">03</text>
+<text x="436.7" y="170" font-size="19" font-weight="700" fill="#111111">17 项规则检查</text>
+<text x="436.7" y="198" font-size="15" font-weight="400" fill="#33332e">直接回答、主体、</text>
+<text x="436.7" y="220" font-size="15" font-weight="400" fill="#33332e">证据、摘录、时效</text>
+<path d="M592.0 179.0 L606.0 179.0" stroke="#111111" stroke-width="2.5"/>
+<path d="M600.0 173.0 L608.0 179.0 L600.0 185.0" fill="none" stroke="#111111" stroke-width="2.5"/>
+<rect x="611.0" y="104" width="168.3" height="150" rx="14" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="627.0" y="138" font-size="15" font-weight="700" fill="#686860">04</text>
+<text x="627.0" y="170" font-size="19" font-weight="700" fill="#111111">算引用友好度</text>
+<text x="627.0" y="198" font-size="15" font-weight="400" fill="#33332e">0 到 100 分，</text>
+<text x="627.0" y="220" font-size="15" font-weight="400" fill="#33332e">提示项不计分</text>
+<path d="M782.3 179.0 L796.3 179.0" stroke="#111111" stroke-width="2.5"/>
+<path d="M790.3 173.0 L798.3 179.0 L790.3 185.0" fill="none" stroke="#111111" stroke-width="2.5"/>
+<rect x="801.3" y="104" width="168.3" height="150" rx="14" fill="#ffd900" stroke="#111111" stroke-width="2"/>
+<text x="817.3" y="138" font-size="15" font-weight="700" fill="#686860">05</text>
+<text x="817.3" y="170" font-size="19" font-weight="700" fill="#111111">逐项给出位置</text>
+<text x="817.3" y="198" font-size="15" font-weight="400" fill="#33332e">编辑器虚线标注，</text>
+<text x="817.3" y="220" font-size="15" font-weight="400" fill="#33332e">悬停看改法</text>
+<path d="M972.7 179.0 L986.7 179.0" stroke="#111111" stroke-width="2.5"/>
+<path d="M980.7 173.0 L988.7 179.0 L980.7 185.0" fill="none" stroke="#111111" stroke-width="2.5"/>
+<rect x="991.7" y="104" width="168.3" height="150" rx="14" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="1007.7" y="138" font-size="15" font-weight="700" fill="#686860">06</text>
+<text x="1007.7" y="170" font-size="19" font-weight="700" fill="#111111">修改后复查</text>
+<text x="1007.7" y="198" font-size="15" font-weight="400" fill="#33332e">或复制检查报告</text>
+<text x="1007.7" y="220" font-size="15" font-weight="400" fill="#33332e">给作者</text>
+<text x="40" y="294" font-size="16" fill="#686860">分数只反映写法是否便于 AI 理解和引用，不代表会被收录、引用或推荐。</text>
+</svg>
